@@ -42,7 +42,7 @@ const ATS_RULES = `Regras do currículo ATS: coluna única, texto puro, sem tabe
 export const analyzeAndGenerate = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("Chave de IA não configurada.");
     const { createOpenAI } = await import("@ai-sdk/openai");
     const { streamText, Output } = await import("ai");

@@ -76,7 +76,7 @@ function App() {
   const atual = vagas.find((v) => v.id === atualId) ?? null;
 
   async function importar() {
-    if (importTxt.trim().length < 20) return toast.error("Cole o texto do seu currículo.");
+    if (importTxt.trim().length < 20) { toast.error("Cole o texto do seu currículo."); return; }
     setLoading("import");
     try {
       const p = (await call({ data: { mode: "import", texto: importTxt } })) as Profile;
@@ -86,8 +86,8 @@ function App() {
   }
 
   async function analisar() {
-    if (!perfil.nome && !perfil.experiencias) return toast.error("Preencha seu perfil primeiro.");
-    if (!nova.cargo || nova.descricao.trim().length < 20) return toast.error("Informe o cargo e cole a descrição da vaga.");
+    if (!perfil.nome && !perfil.experiencias) { toast.error("Preencha seu perfil primeiro."); return; }
+    if (!nova.cargo || nova.descricao.trim().length < 20) { toast.error("Informe o cargo e cole a descrição da vaga."); return; }
     setLoading("analyze");
     try {
       const a = (await call({ data: { mode: "analyze", perfil, vaga: nova } })) as Analysis;
