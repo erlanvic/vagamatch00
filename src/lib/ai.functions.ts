@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const profileShape = {
   nome: z.string(),
@@ -40,6 +41,7 @@ const Input = z.discriminatedUnion("mode", [
 const ATS_RULES = `Regras do currículo ATS: coluna única, texto puro, sem tabelas, imagens, ícones ou emojis. Comece com nome e contato/links. Seções nesta ordem com títulos em MAIÚSCULAS: RESUMO PROFISSIONAL, EXPERIÊNCIA PROFISSIONAL, FORMAÇÃO, HABILIDADES, CURSOS E IDIOMAS. Datas no formato MM/AAAA. Bullets simples com "- " iniciando por verbos de ação. Reescreva o resumo e os bullets incorporando palavras-chave da vaga, mas NUNCA invente empresas, cargos, datas, formações, certificações ou habilidades que não estejam no perfil.`;
 
 export const analyzeAndGenerate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }) => {
     const apiKey = process.env["LOVABLE_API_KEY"];

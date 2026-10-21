@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -11,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { analyzeAndGenerate, type Analysis, type Profile } from "@/lib/ai.functions";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({
     meta: [
       { title: "VagaMatch — Currículo ATS para cada vaga" },
@@ -51,7 +53,7 @@ function useLocal<T>(key: string, initial: T) {
   return [v, setV] as const;
 }
 
-function Logo() {
+export function Logo() {
   return (
     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent">
       <svg viewBox="0 0 32 32" className="h-6 w-6" fill="none" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
@@ -72,6 +74,15 @@ function App() {
   const [showImport, setShowImport] = useState(false);
   const [loading, setLoading] = useState<"import" | "analyze" | null>(null);
   const call = useServerFn(analyzeAndGenerate);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [email, setEmail] = useState("");
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? "")); }, []);
+  async function sair() {
+    await queryClient.cancelQueries(); queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
 
   const atual = vagas.find((v) => v.id === atualId) ?? null;
 
@@ -108,6 +119,10 @@ function App() {
           <div>
             <h1 className="text-xl font-extrabold tracking-tight">Vaga<span className="text-primary">Match</span></h1>
             <p className="text-xs text-muted-foreground">Currículo ATS sob medida para cada vaga</p>
+          </div>
+          <div className="ml-auto flex items-center gap-3">
+            <span className="hidden text-sm text-muted-foreground sm:inline">{email}</span>
+            <Button variant="outline" size="sm" onClick={sair}>Sair</Button>
           </div>
         </div>
       </header>
