@@ -62,7 +62,7 @@ export const analyzeAndGenerate = createServerFn({ method: "POST" })
       system: "Você é especialista em recrutamento e currículos ATS no Brasil. Responda em português do Brasil.",
       prompt,
       maxRetries: 0,
-      output: Output.object({ schema: isImport ? ProfileSchema : AnalysisSchema }),
+      output: Output.object({ schema: (isImport ? ProfileSchema : AnalysisSchema) as typeof AnalysisSchema }),
       providerOptions: {
         openai: {
           forceReasoning: true,
